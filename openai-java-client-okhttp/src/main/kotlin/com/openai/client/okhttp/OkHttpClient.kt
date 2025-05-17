@@ -28,6 +28,8 @@ import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import okio.BufferedSink
 
+typealias OkHttpClientCustomizer = (okhttp3.OkHttpClient.Builder) -> Unit
+
 class OkHttpClient
 private constructor(private val okHttpClient: okhttp3.OkHttpClient, private val baseUrl: HttpUrl) :
     HttpClient {
@@ -207,7 +209,7 @@ private constructor(private val okHttpClient: okhttp3.OkHttpClient, private val 
 
         fun proxy(proxy: Proxy?) = apply { this.proxy = proxy }
 
-        fun build(block: (okhttp3.OkHttpClient.Builder) -> Unit): OkHttpClient {
+        fun build(block: OkHttpClientCustomizer): OkHttpClient {
             val client = clientBuilder
                 .connectTimeout(timeout.connect())
                 .readTimeout(timeout.read())

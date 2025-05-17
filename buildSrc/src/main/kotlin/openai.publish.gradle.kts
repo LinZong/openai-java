@@ -17,7 +17,7 @@ extra["signingInMemoryKeyId"] = System.getenv("GPG_SIGNING_KEY_ID")
 extra["signingInMemoryKeyPassword"] = System.getenv("GPG_SIGNING_PASSWORD")
 
 configure<MavenPublishBaseExtension> {
-    signAllPublications()
+    // signAllPublications()
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
 
     coordinates(project.group.toString(), project.name, project.version.toString())

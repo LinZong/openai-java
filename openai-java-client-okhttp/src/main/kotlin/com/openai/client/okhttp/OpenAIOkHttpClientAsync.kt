@@ -16,6 +16,7 @@ import java.time.Clock
 import java.time.Duration
 import java.util.Optional
 import java.util.concurrent.Executor
+import java.util.function.Consumer
 import kotlin.jvm.optionals.getOrNull
 
 class OpenAIOkHttpClientAsync private constructor() {
@@ -34,6 +35,8 @@ class OpenAIOkHttpClientAsync private constructor() {
         private var clientOptions: ClientOptions.Builder = ClientOptions.builder()
         private var timeout: Timeout = Timeout.default()
         private var proxy: Proxy? = null
+        private var clientCustomizer: OkHttpClientCustomizer? = null
+
 
         fun baseUrl(baseUrl: String) = apply { clientOptions.baseUrl(baseUrl) }
 
@@ -179,6 +182,19 @@ class OpenAIOkHttpClientAsync private constructor() {
         fun fromEnv() = apply { clientOptions.fromEnv() }
 
         /**
+         * Customize underlying OkHttpClient.
+         */
+        fun httpClient(block: OkHttpClientCustomizer) = apply { clientCustomizer = block }
+
+        /**
+         * Customize underlying OkHttpClient. For convenience of lambda in java.
+         */
+        fun httpClient(block: Consumer<okhttp3.OkHttpClient.Builder>) =
+            apply { clientCustomizer = { block.accept(it) } }
+
+
+
+        /**
          * Returns an immutable instance of [OpenAIClientAsync].
          *
          * Further updates to this [Builder] will not mutate the returned instance.
@@ -191,7 +207,7 @@ class OpenAIOkHttpClientAsync private constructor() {
                             .baseUrl(clientOptions.baseUrl())
                             .timeout(timeout)
                             .proxy(proxy)
-                            .build()
+                            .build(clientCustomizer ?: {})
                     )
                     .build()
             )
