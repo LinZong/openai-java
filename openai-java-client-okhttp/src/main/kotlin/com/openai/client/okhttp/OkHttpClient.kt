@@ -197,6 +197,7 @@ private constructor(private val okHttpClient: okhttp3.OkHttpClient, private val 
         private var baseUrl: HttpUrl? = null
         private var timeout: Timeout = Timeout.default()
         private var proxy: Proxy? = null
+        private val clientBuilder = okhttp3.OkHttpClient.Builder()
 
         fun baseUrl(baseUrl: String) = apply { this.baseUrl = baseUrl.toHttpUrl() }
 
@@ -206,16 +207,20 @@ private constructor(private val okHttpClient: okhttp3.OkHttpClient, private val 
 
         fun proxy(proxy: Proxy?) = apply { this.proxy = proxy }
 
-        fun build(): OkHttpClient =
-            OkHttpClient(
-                okhttp3.OkHttpClient.Builder()
-                    .connectTimeout(timeout.connect())
-                    .readTimeout(timeout.read())
-                    .writeTimeout(timeout.write())
-                    .callTimeout(timeout.request())
-                    .proxy(proxy)
-                    .build(),
-                checkRequired("baseUrl", baseUrl),
-            )
+        fun build(block: (okhttp3.OkHttpClient.Builder) -> Unit): OkHttpClient {
+            val client = clientBuilder
+                .connectTimeout(timeout.connect())
+                .readTimeout(timeout.read())
+                .writeTimeout(timeout.write())
+                .callTimeout(timeout.request())
+                .proxy(proxy)
+                .apply(block)
+                .build()
+            return OkHttpClient(client, checkRequired("baseUrl", baseUrl))
+        }
+
+        fun build(): OkHttpClient {
+            return build {}
+        }
     }
 }
