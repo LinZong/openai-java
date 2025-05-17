@@ -180,16 +180,13 @@ class OpenAIOkHttpClient private constructor() {
 
         fun fromEnv() = apply { clientOptions.fromEnv() }
 
-        /**
-         * Customize underlying OkHttpClient.
-         */
+        /** Customize underlying OkHttpClient. */
         fun httpClient(block: OkHttpClientCustomizer) = apply { clientCustomizer = block }
 
-        /**
-         * Customize underlying OkHttpClient. For convenience of lambda in java.
-         */
-        fun httpClient(block: Consumer<okhttp3.OkHttpClient.Builder>) =
-            apply { clientCustomizer = { block.accept(it) } }
+        /** Customize underlying OkHttpClient. For convenience of lambda in java. */
+        fun httpClient(block: Consumer<okhttp3.OkHttpClient.Builder>) = apply {
+            clientCustomizer = { block.accept(it) }
+        }
 
         /**
          * Returns an immutable instance of [OpenAIClient].

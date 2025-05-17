@@ -210,14 +210,15 @@ private constructor(private val okHttpClient: okhttp3.OkHttpClient, private val 
         fun proxy(proxy: Proxy?) = apply { this.proxy = proxy }
 
         fun build(block: OkHttpClientCustomizer): OkHttpClient {
-            val client = clientBuilder
-                .connectTimeout(timeout.connect())
-                .readTimeout(timeout.read())
-                .writeTimeout(timeout.write())
-                .callTimeout(timeout.request())
-                .proxy(proxy)
-                .apply(block)
-                .build()
+            val client =
+                clientBuilder
+                    .connectTimeout(timeout.connect())
+                    .readTimeout(timeout.read())
+                    .writeTimeout(timeout.write())
+                    .callTimeout(timeout.request())
+                    .proxy(proxy)
+                    .apply(block)
+                    .build()
             return OkHttpClient(client, checkRequired("baseUrl", baseUrl))
         }
 
